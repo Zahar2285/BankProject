@@ -15,8 +15,7 @@ def filter_by_state(
     Returns:
         Новый список операций с указанным статусом.
     """
-    return [operation for operation in operations
-            if operation.get("state") == state]
+    return [operation for operation in operations if operation.get("state") == state]
 
 
 def sort_by_date(
