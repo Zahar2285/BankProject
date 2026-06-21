@@ -53,6 +53,29 @@ from src.widget import mask_account_card
 print(mask_account_card("Visa Platinum 7000792289606361"))
 ```
 
+## Тестирование
+
+Для запуска тестов выполните:
+
+```bash
+pytest
+```
+
+Для получения отчета о покрытии:
+
+```bash
+pytest --cov=src --cov-report=html
+```
+
+После выполнения будет создан каталог `htmlcov` с HTML-отчетом о покрытии кода тестами.
+
+Для проверки качества кода:
+
+```bash
+flake8 .
+mypy src
+```
+
 ## Автор
 
 Александр Захаров
