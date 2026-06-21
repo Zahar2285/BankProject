@@ -1,5 +1,9 @@
 import pytest
+import sys
+from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
 
 @pytest.fixture
 def operations():
@@ -25,3 +29,4 @@ def operations():
             "date": "2018-10-14T08:21:33.419441",
         },
     ]
+
