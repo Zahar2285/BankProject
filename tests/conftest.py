@@ -5,6 +5,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
+
 @pytest.fixture
 def operations():
     return [
@@ -30,3 +31,28 @@ def operations():
         },
     ]
 
+@pytest.fixture
+def transactions():
+    return [
+        {
+            "id": 1,
+            "operationAmount": {
+                "currency": {"code": "USD"}
+            },
+            "description": "Перевод организации",
+        },
+        {
+            "id": 2,
+            "operationAmount": {
+                "currency": {"code": "RUB"}
+            },
+            "description": "Оплата",
+        },
+        {
+            "id": 3,
+            "operationAmount": {
+                "currency": {"code": "USD"}
+            },
+            "description": "Перевод со счета",
+        },
+    ]
