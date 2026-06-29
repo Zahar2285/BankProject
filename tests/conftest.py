@@ -31,6 +31,7 @@ def operations():
         },
     ]
 
+
 @pytest.fixture
 def transactions():
     return [
