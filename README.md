@@ -76,6 +76,46 @@ flake8 .
 mypy src
 ```
 
+### Модуль `generators`
+
+Проект содержит модуль `generators`, предназначенный для обработки транзакций с помощью генераторов.
+
+#### `filter_by_currency()`
+
+Возвращает только транзакции с указанной валютой.
+
+```python
+from src.generators import filter_by_currency
+
+usd_transactions = filter_by_currency(transactions, "USD")
+
+for transaction in usd_transactions:
+    print(transaction)
+```
+
+#### `transaction_descriptions()`
+
+Последовательно возвращает описания операций.
+
+```python
+from src.generators import transaction_descriptions
+
+for description in transaction_descriptions(transactions):
+    print(description)
+```
+
+#### `card_number_generator()`
+
+Генерирует номера банковских карт в формате `XXXX XXXX XXXX XXXX`.
+
+```python
+from src.generators import card_number_generator
+
+for number in card_number_generator(1, 5):
+    print(number)
+```
+
+
 ## Автор
 
 Александр Захаров
