@@ -114,8 +114,24 @@ from src.generators import card_number_generator
 for number in card_number_generator(1, 5):
     print(number)
 ```
+## Модуль decorators
+
+В проект добавлен модуль `decorators`, содержащий декоратор `log`.
+
+### Пример использования
+
+```python
+from src.decorators import log
 
 
-## Автор
+@log()
+def add(a, b):
+    return a + b
+
+
+add(2, 3) 
+```
+    
+### Автор
 
 Александр Захаров
