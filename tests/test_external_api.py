@@ -5,9 +5,10 @@ from src.external_api import convert_to_rub
 
 @patch("src.external_api.requests.get")
 def test_convert_usd(mock_get):
-
     mock_get.return_value.json.return_value = {
-        "result": 9100
+        "rates": {
+            "RUB": 91.0
+        }
     }
 
     transaction = {
@@ -19,4 +20,4 @@ def test_convert_usd(mock_get):
         }
     }
 
-    assert convert_to_rub(transaction) == 9100
+    assert convert_to_rub(transaction) == 9100.0
