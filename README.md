@@ -132,6 +132,25 @@ def add(a, b):
 add(2, 3) 
 ```
     
+## Новые возможности
+
+### load_transactions(path)
+
+Читает JSON-файл и возвращает список транзакций.
+
+### convert_to_rub(transaction)
+
+Конвертирует сумму операции в рубли через Exchange Rates Data API.
+
+## Пример
+
+```python
+from src.utils import load_transactions
+from src.external_api import convert_to_rub
+
+transactions = load_transactions("data/operations.json")
+
+print(convert_to_rub(transactions[0]))
 ### Автор
 
 Александр Захаров
