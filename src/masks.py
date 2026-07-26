@@ -18,6 +18,7 @@ file_handler.setFormatter(file_formatter)
 if not logger.handlers:
     logger.addHandler(file_handler)
 
+
 def get_mask_card_number(card_number: str) -> str:
     logger.debug("Начало маскирования номера карты")
 
@@ -34,6 +35,7 @@ def get_mask_card_number(card_number: str) -> str:
     logger.info("Номер карты успешно замаскирован")
 
     return result
+
 
 def get_mask_account(account: str) -> str:
     logger.debug("Начало маскирования счета")
