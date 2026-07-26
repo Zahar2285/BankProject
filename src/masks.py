@@ -13,6 +13,10 @@ file_formatter = logging.Formatter(
     "%(asctime)s %(name)s %(levelname)s %(message)s"
 )
 
+file_handler.setFormatter(file_formatter)
+
+if not logger.handlers:
+    logger.addHandler(file_handler)
 
 def get_mask_card_number(card_number: str) -> str:
     logger.debug("Начало маскирования номера карты")
@@ -35,7 +39,8 @@ def get_mask_account(account: str) -> str:
     logger.debug("Начало маскирования счета")
 
     if len(account) < 4:
-        logger.error("Некорректный номер счета")
+        logger.error("Некорректный номер счета: %s", account)
+        raise ValueError("Некорректный номер счета")
 
     result = "**" + account[-4:]
 
