@@ -3,9 +3,9 @@ name = "pythonproject2"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Your Name",email = "you@example.com"}
+    {name = "Alexandr",email = "Zahar2285@mail.ru"}
 ]
-requires-python = "^3.10"
+python = ">=3.11,<3.14"
 dependencies = [
     "autopep8 (>=2.3.2,<3.0.0)",
     "python-dotenv (>=1.2.2,<2.0.0)",
@@ -47,4 +47,11 @@ dev = [
     "mypy (<1.18)",
     "isort (>=8.0.1,<9.0.0)"
 ]
+
+[tool.poetry]
+name = "pythonproject2"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
 
