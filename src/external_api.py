@@ -10,7 +10,6 @@ def convert_to_rub(transaction: dict) -> float:
     """
     Возвращает сумму операции в рублях.
     """
-
     amount = float(transaction["operationAmount"]["amount"])
     currency = transaction["operationAmount"]["currency"]["code"]
 
@@ -18,6 +17,9 @@ def convert_to_rub(transaction: dict) -> float:
         return amount
 
     api_key = os.getenv("API_KEY")
+
+    if api_key is None:
+        raise ValueError("API_KEY не найден в переменных окружения")
 
     response = requests.get(
         "https://api.apilayer.com/exchangerates_data/latest",
@@ -29,6 +31,7 @@ def convert_to_rub(transaction: dict) -> float:
         timeout=10,
     )
 
-    rate = response.json()["rates"]["RUB"]
+    rate = float(response.json()["rates"]["RUB"])
 
     return amount * rate
+
