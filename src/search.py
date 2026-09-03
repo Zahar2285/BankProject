@@ -3,7 +3,10 @@ from collections import Counter
 
 
 def process_bank_search(data: list[dict], search: str) -> list[dict]:
-    """Возвращает транзакции, содержащие поисковую строку в описании."""
+    """Возвращает транзакции с искомой строкой в описании.
+
+    Поиск выполняется без учета регистра.
+    """
     pattern = re.compile(re.escape(search), re.IGNORECASE)
 
     return [
