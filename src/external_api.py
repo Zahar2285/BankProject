@@ -34,4 +34,3 @@ def convert_to_rub(transaction: dict) -> float:
     rate = float(response.json()["rates"]["RUB"])
 
     return amount * rate
-

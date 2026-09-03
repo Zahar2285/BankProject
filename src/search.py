@@ -31,4 +31,3 @@ def process_bank_operations(
         category: counter.get(category, 0)
         for category in categories
     }
-
