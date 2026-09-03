@@ -22,4 +22,4 @@ def test_convert_usd(mock_get, mock_getenv):
     }
 
     assert convert_to_rub(transaction) == 9100.0
-    
+
