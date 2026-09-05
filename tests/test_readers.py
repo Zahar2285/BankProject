@@ -19,7 +19,7 @@ def test_read_csv(mock_read_csv):
         {"id": 1, "amount": 100},
         {"id": 2, "amount": 200},
     ]
-    mock_read_csv.assert_called_once_with("transactions.csv")
+    mock_read_csv.assert_called_once_with("transactions.csv", sep=";")
 
 
 @patch("src.readers.pd.read_excel")
