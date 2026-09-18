@@ -1,6 +1,8 @@
 from functools import wraps
 from typing import Any, Callable
 
+from src.utils import load_operations
+
 
 def report(filename: str = "report.txt") -> Callable:
     """Декоратор сохраняет результат отчёта в файл."""
