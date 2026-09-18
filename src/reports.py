@@ -23,8 +23,8 @@ def report(filename: str = "report.txt") -> Callable:
 
 
 @report()
-def spending_by_category(data: list[dict], category: str) -> float:
-    """Считает общую сумму трат по указанной категории."""
+def spending_by_category(data: list[dict], category: str) -> str:
+    """Формирует отчёт о тратах по указанной категории."""
     total = 0.0
 
     for transaction in data:
@@ -34,4 +34,5 @@ def spending_by_category(data: list[dict], category: str) -> float:
             if amount < 0:
                 total += abs(amount)
 
-    return round(total, 2)
+    return f"Категория: {category}\nСумма трат: {round(total, 2)} руб."
+
