@@ -24,3 +24,29 @@ def test_spending_by_category():
     result = spending_by_category(data, "Супермаркеты")
 
     assert result == "Категория: Супермаркеты\nСумма трат: 300.75 руб."
+
+from src.reports import spending_by_category, spending_by_weekday
+
+
+def test_spending_by_weekday():
+    data = [
+        {
+            "Дата операции": "01.09.2026 10:00:00",
+            "Сумма операции": -100.00,
+        },
+        {
+            "Дата операции": "02.09.2026 10:00:00",
+            "Сумма операции": -200.00,
+        },
+        {
+            "Дата операции": "01.09.2026 12:00:00",
+            "Сумма операции": -50.00,
+        },
+    ]
+
+    result = spending_by_weekday(data)
+
+    assert result == {
+        "Tuesday": 150.0,
+        "Wednesday": 200.0,
+    }
