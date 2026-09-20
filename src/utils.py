@@ -50,6 +50,7 @@ def load_transactions(path: str) -> list[dict]:
         logger.error("Ошибка декодирования JSON: %s", path)
         return []
 
+
 def load_operations(path: str) -> list[dict]:
     """Загружает операции из Excel-файла."""
     dataframe = pd.read_excel(path)

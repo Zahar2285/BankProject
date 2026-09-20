@@ -2,8 +2,6 @@ from datetime import datetime
 from functools import wraps
 from typing import Any, Callable
 
-from src.utils import load_operations
-
 
 def report(filename: str = "report.txt") -> Callable:
     """Декоратор сохраняет результат отчёта в файл."""
@@ -36,6 +34,7 @@ def spending_by_category(data: list[dict], category: str) -> str:
                 total += abs(amount)
 
     return f"Категория: {category}\nСумма трат: {round(total, 2)} руб."
+
 
 @report("report_weekday.txt")
 def spending_by_weekday(data: list[dict]) -> dict[str, float]:
