@@ -1,3 +1,6 @@
+import re
+
+
 def simple_search(data: list[dict], search: str) -> list[dict]:
     """Ищет операции по категории или описанию."""
     search = search.lower()
