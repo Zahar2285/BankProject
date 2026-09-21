@@ -39,7 +39,7 @@ def spending_by_category(data: list[dict], category: str) -> str:
 @report("report_weekday.txt")
 def spending_by_weekday(data: list[dict]) -> dict[str, float]:
     """Считает сумму трат по дням недели."""
-    result = {}
+    result: dict[str, float] = {}
 
     for transaction in data:
         amount = transaction.get("Сумма операции", 0)
