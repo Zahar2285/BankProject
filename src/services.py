@@ -12,3 +12,17 @@ def simple_search(data: list[dict], search: str) -> list[dict]:
             result.append(transaction)
 
     return result
+
+def search_phone_numbers(data: list[dict]) -> list[dict]:
+    """Ищет операции, в описании которых есть номер телефона."""
+    pattern = re.compile(r"\+7\s?\d{3}\s?\d{2}[-\s]?\d{2}[-\s]?\d{2}")
+
+    result = []
+
+    for transaction in data:
+        description = str(transaction.get("Описание", ""))
+
+        if pattern.search(description):
+            result.append(transaction)
+
+    return result
