@@ -29,3 +29,18 @@ def search_phone_numbers(data: list[dict]) -> list[dict]:
             result.append(transaction)
 
     return result
+
+def search_person_transfers(data: list[dict]) -> list[dict]:
+    """Ищет переводы физическим лицам."""
+    pattern = re.compile(r"[А-ЯЁ][а-яё]+\s+[А-ЯЁ]\.")
+
+    result = []
+
+    for transaction in data:
+        category = str(transaction.get("Категория", ""))
+        description = str(transaction.get("Описание", ""))
+
+        if category == "Переводы" and pattern.search(description):
+            result.append(transaction)
+
+    return result
