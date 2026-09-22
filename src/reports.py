@@ -61,3 +61,34 @@ def spending_by_weekday(data: list[dict]) -> dict[str, float]:
         day: round(total, 2)
         for day, total in result.items()
     }
+
+@report("report_weekend.txt")
+def spending_by_workday(data: list[dict]) -> dict[str, float]:
+    """Считает траты отдельно в рабочие и выходные дни."""
+    result = {
+        "Рабочий день": 0.0,
+        "Выходной день": 0.0,
+    }
+
+    for transaction in data:
+        amount = transaction.get("Сумма операции", 0)
+
+        if amount >= 0:
+            continue
+
+        date = transaction.get("Дата операции")
+
+        if not date:
+            continue
+
+        date = datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
+
+        if date.weekday() < 5:
+            result["Рабочий день"] += abs(amount)
+        else:
+            result["Выходной день"] += abs(amount)
+
+    return {
+        day: round(total, 2)
+        for day, total in result.items()
+    }
