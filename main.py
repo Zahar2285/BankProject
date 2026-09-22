@@ -176,6 +176,15 @@ def main() -> None:
 
     _print_transactions(transactions)
 
+from src.utils import load_operations
+
+
+def main() -> None:
+    """Запускает приложение."""
+    data = load_operations("data/operations.xlsx")
+
+    print(f"Загружено операций: {len(data)}")
+
 
 if __name__ == "__main__":
     main()
