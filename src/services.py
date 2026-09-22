@@ -44,3 +44,4 @@ def search_person_transfers(data: list[dict]) -> list[dict]:
             result.append(transaction)
 
     return result
+
