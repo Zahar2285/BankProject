@@ -3,6 +3,9 @@ from src.readers import read_csv, read_excel
 from src.search import process_bank_search
 from src.utils import load_transactions
 from src.widget import get_date, mask_account_card
+from src.utils import load_operations
+from datetime import datetime
+
 
 DATA_PATHS = {
     "1": "data/operations.json",
@@ -176,14 +179,25 @@ def main() -> None:
 
     _print_transactions(transactions)
 
-from src.utils import load_operations
-
 
 def main() -> None:
     """Запускает приложение."""
     data = load_operations("data/operations.xlsx")
 
     print(f"Загружено операций: {len(data)}")
+
+    current_hour = datetime.now().hour
+
+    if 5 <= current_hour < 12:
+        greeting = "Доброе утро"
+    elif 12 <= current_hour < 18:
+        greeting = "Добрый день"
+    elif 18 <= current_hour < 23:
+        greeting = "Добрый вечер"
+    else:
+        greeting = "Доброй ночи"
+
+    print(greeting)
 
 
 if __name__ == "__main__":
