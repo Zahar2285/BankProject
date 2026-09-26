@@ -3,7 +3,6 @@ from src.readers import read_csv, read_excel
 from src.search import process_bank_search
 from src.utils import load_transactions
 from src.widget import get_date, mask_account_card
-from src.utils import load_operations
 from datetime import datetime
 
 
@@ -111,6 +110,53 @@ def _print_transactions(transactions: list[dict]) -> None:
     for transaction in transactions:
         print(f"\n{_format_transaction(transaction)}")
 
+def show_main_page(data: list[dict]) -> None:
+    """Выводит информацию для главной страницы."""
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_hour = datetime.now().hour
+
+    if 5 <= current_hour < 12:
+        greeting = "Доброе утро"
+    elif 12 <= current_hour < 18:
+        greeting = "Добрый день"
+    elif 18 <= current_hour < 23:
+        greeting = "Добрый вечер"
+    else:
+        greeting = "Доброй ночи"
+
+    card_number = data[0].get("Номер карты", "")
+    last_four = str(card_number)[-4:]
+
+    total_spent = 0.0
+
+    for transaction in data:
+        amount = transaction.get("Сумма операции", 0)
+
+        if amount < 0:
+            total_spent += abs(amount)
+
+    cashback = round(total_spent / 100, 2)
+
+    top_transactions = sorted(
+        data,
+        key=lambda transaction: abs(transaction.get("Сумма операции", 0)),
+        reverse=True,
+    )[:5]
+
+    print(current_datetime)
+    print(greeting)
+    print(f"Последние 4 цифры карты: {last_four}")
+    print(f"Всего потрачено: {round(total_spent, 2)} руб.")
+    print(f"Кэшбэк: {cashback} руб.")
+
+    print("Топ-5 операций:")
+
+    for transaction in top_transactions:
+        print(
+            transaction.get("Дата операции"),
+            transaction.get("Описание"),
+            transaction.get("Сумма операции"),
+        )
 
 def main() -> None:
     """Запускает консольный интерфейс программы.
@@ -178,27 +224,6 @@ def main() -> None:
         transactions = process_bank_search(transactions, search)
 
     _print_transactions(transactions)
-
-
-def main() -> None:
-    """Запускает приложение."""
-    data = load_operations("data/operations.xlsx")
-
-    print(f"Загружено операций: {len(data)}")
-
-    current_hour = datetime.now().hour
-
-    if 5 <= current_hour < 12:
-        greeting = "Доброе утро"
-    elif 12 <= current_hour < 18:
-        greeting = "Добрый день"
-    elif 18 <= current_hour < 23:
-        greeting = "Добрый вечер"
-    else:
-        greeting = "Доброй ночи"
-
-    print(greeting)
-
 
 if __name__ == "__main__":
     main()
