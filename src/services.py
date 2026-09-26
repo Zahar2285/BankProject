@@ -16,7 +16,9 @@ def simple_search(data: list[dict], search: str) -> list[dict]:
 
     return result
 
+
 def search_phone_numbers(data: list[dict]) -> list[dict]:
+
     """Ищет операции, в описании которых есть номер телефона."""
     pattern = re.compile(r"\+7\s?\d{3}\s?\d{2}[-\s]?\d{2}[-\s]?\d{2}")
 
@@ -30,7 +32,9 @@ def search_phone_numbers(data: list[dict]) -> list[dict]:
 
     return result
 
+
 def search_person_transfers(data: list[dict]) -> list[dict]:
+
     """Ищет переводы физическим лицам."""
     pattern = re.compile(r"[А-ЯЁ][а-яё]+\s+[А-ЯЁ]\.")
 
@@ -44,4 +48,3 @@ def search_person_transfers(data: list[dict]) -> list[dict]:
             result.append(transaction)
 
     return result
-

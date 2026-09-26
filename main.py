@@ -110,6 +110,7 @@ def _print_transactions(transactions: list[dict]) -> None:
     for transaction in transactions:
         print(f"\n{_format_transaction(transaction)}")
 
+
 def show_main_page(data: list[dict]) -> None:
     """Выводит информацию для главной страницы."""
     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -158,7 +159,9 @@ def show_main_page(data: list[dict]) -> None:
             transaction.get("Сумма операции"),
         )
 
+
 def main() -> None:
+
     """Запускает консольный интерфейс программы.
 
     Пользователь выбирает источник данных и параметры выборки.
