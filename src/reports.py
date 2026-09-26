@@ -64,7 +64,6 @@ def spending_by_weekday(data: list[dict]) -> dict[str, float]:
 
 
 @report("report_weekend.txt")
-
 def spending_by_workday(data: list[dict]) -> dict[str, float]:
     """Считает траты отдельно в рабочие и выходные дни."""
     result = {

@@ -1,10 +1,10 @@
+from datetime import datetime
+
 from src.processing import filter_by_state, sort_by_date
 from src.readers import read_csv, read_excel
 from src.search import process_bank_search
 from src.utils import load_transactions
 from src.widget import get_date, mask_account_card
-from datetime import datetime
-
 
 DATA_PATHS = {
     "1": "data/operations.json",
@@ -227,6 +227,7 @@ def main() -> None:
         transactions = process_bank_search(transactions, search)
 
     _print_transactions(transactions)
+
 
 if __name__ == "__main__":
     main()
