@@ -1,11 +1,13 @@
 from datetime import datetime
+from typing import TypedDict
+
+import pandas as pd
 
 from src.processing import filter_by_state, sort_by_date
 from src.readers import read_csv, read_excel
 from src.search import process_bank_search
-from src.utils import load_transactions
+from src.utils import load_operations, load_transactions
 from src.widget import get_date, mask_account_card
-from src.utils import load_operations
 
 DATA_PATHS = {
     "1": "data/operations.json",
@@ -112,12 +114,20 @@ def _print_transactions(transactions: list[dict]) -> None:
         print(f"\n{_format_transaction(transaction)}")
 
 
-def show_main_page(data: list[dict]) -> None:
-    """Выводит информацию для главной страницы."""
-    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_hour = datetime.now().hour
+class CardInfo(TypedDict):
+    """Данные карты для главной страницы."""
 
-    if 5 <= current_hour < 12:
+    last_digits: str
+    total_spent: float
+    cashback: float
+
+
+def show_main_page(data: list[dict]) -> dict:
+    """Формирует данные для главной страницы."""
+    current_datetime = datetime.now()
+    current_hour = current_datetime.hour
+
+    if 6 <= current_hour < 12:
         greeting = "Доброе утро"
     elif 12 <= current_hour < 18:
         greeting = "Добрый день"
@@ -126,39 +136,73 @@ def show_main_page(data: list[dict]) -> None:
     else:
         greeting = "Доброй ночи"
 
-    card_number = data[0].get("Номер карты", "")
-    last_four = str(card_number)[-4:]
-
-    total_spent = 0.0
+    cards: dict[str, CardInfo] = {}
 
     for transaction in data:
+        card_number = transaction.get("Номер карты")
+
+        if not card_number or str(card_number) == "nan":
+            continue
+
+        last_digits = str(card_number)[-4:]
         amount = transaction.get("Сумма операции", 0)
 
-        if amount < 0:
-            total_spent += abs(amount)
+        if not isinstance(amount, (int, float)):
+            continue
 
-    cashback = round(total_spent / 100, 2)
+        if last_digits not in cards:
+            cards[last_digits] = {
+                "last_digits": last_digits,
+                "total_spent": 0.0,
+                "cashback": 0.0,
+            }
+
+        if amount < 0:
+            cards[last_digits]["total_spent"] += abs(amount)
+
+    for card in cards.values():
+        card["total_spent"] = round(float(card["total_spent"]), 2)
+        card["cashback"] = round(float(card["total_spent"]) / 100, 2)
 
     top_transactions = sorted(
         data,
-        key=lambda transaction: abs(transaction.get("Сумма операции", 0)),
+        key=lambda transaction: abs(
+            transaction.get("Сумма операции", 0)
+        ),
         reverse=True,
     )[:5]
 
-    print(current_datetime)
-    print(greeting)
-    print(f"Последние 4 цифры карты: {last_four}")
-    print(f"Всего потрачено: {round(total_spent, 2)} руб.")
-    print(f"Кэшбэк: {cashback} руб.")
-
-    print("Топ-5 операций:")
+    transactions = []
 
     for transaction in top_transactions:
-        print(
-            transaction.get("Дата операции"),
-            transaction.get("Описание"),
-            transaction.get("Сумма операции"),
+        date = str(transaction.get("Дата операции", ""))
+
+        if date:
+            date = datetime.strptime(
+                date,
+                "%d.%m.%Y %H:%M:%S",
+            ).strftime("%d.%m.%Y")
+
+        transactions.append(
+            {
+                "date": date,
+                "amount": transaction.get("Сумма операции", 0),
+                "category": (
+                    ""
+                    if pd.isna(transaction.get("Категория"))
+                    else str(transaction.get("Категория"))
+                ),
+                "description": transaction.get("Описание", ""),
+            }
         )
+
+    return {
+        "greeting": greeting,
+        "cards": list(cards.values()),
+        "top_transactions": transactions,
+        "currency_rates": [],
+        "stock_prices": [],
+    }
 
 
 def run_main_page() -> None:
