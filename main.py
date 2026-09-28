@@ -3,13 +3,17 @@ from typing import TypedDict
 
 import pandas as pd
 import requests
+import json
+import os
 
+from dotenv import load_dotenv
 from src.processing import filter_by_state, sort_by_date
 from src.readers import read_csv, read_excel
 from src.search import process_bank_search
 from src.utils import load_operations, load_transactions
 from src.widget import get_date, mask_account_card
 
+load_dotenv()
 DATA_PATHS = {
     "1": "data/operations.json",
     "2": "data/transactions.csv",
@@ -123,9 +127,51 @@ class CardInfo(TypedDict):
     cashback: float
 
 
+def load_user_settings() -> dict[str, list[str]]:
+    """Загружает пользовательские настройки."""
+    with open("user_settings.json", encoding="utf-8") as file:
+        data = json.load(file)
+
+    return {
+        "user_currencies": list(data["user_currencies"]),
+        "user_stocks": list(data["user_stocks"]),
+    }
+
+
+def get_stock_prices() -> list[dict[str, float | str]]:
+    """Возвращает текущие цены акций."""
+    settings = load_user_settings()
+    stocks = settings["user_stocks"]
+    api_key = os.getenv("STOCK_API_KEY")
+    result: list[dict[str, float | str]] = []
+
+    for stock in stocks:
+        response = requests.get(
+            "https://www.alphavantage.co/query",
+            params={
+                "function": "GLOBAL_QUOTE",
+                "symbol": stock,
+                "apikey": api_key,
+            },
+            timeout=10,
+        )
+        data = response.json()
+
+        price = float(data["Global Quote"]["05. price"])
+        result.append(
+            {
+                "stock": stock,
+                "price": round(price, 2),
+            }
+        )
+
+    return result
+
+
 def get_currency_rates() -> list[dict[str, float | str]]:
     """Возвращает курсы валют."""
-    currencies = ["USD", "EUR", "GBP"]
+    settings = load_user_settings()
+    currencies = settings["user_currencies"]
     result = []
 
     for currency in currencies:
@@ -225,7 +271,7 @@ def show_main_page(data: list[dict]) -> dict:
         "cards": list(cards.values()),
         "top_transactions": transactions,
         "currency_rates": get_currency_rates(),
-        "stock_prices": [],
+        "stock_prices": get_stock_prices(),
     }
 
 
