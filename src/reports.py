@@ -67,12 +67,10 @@ def spending_by_category(
 
     if "Категория" in dataframe.columns:
         result = dataframe.loc[
-            dataframe["Категория"] == category
-            ]
+            dataframe["Категория"] == category]
     else:
         result = dataframe.loc[
-            dataframe["description"] == category
-            ]
+            dataframe["description"] == category]
 
     return result
 

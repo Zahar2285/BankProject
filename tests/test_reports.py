@@ -67,6 +67,7 @@ def test_spending_by_weekday():
 
     assert result["amount"].sum() == 350.00
 
+
 def test_spending_by_workday():
     data = pd.DataFrame(
         [
