@@ -1,4 +1,3 @@
-from datetime import datetime
 from functools import wraps
 from typing import Any, Callable
 
@@ -46,11 +45,11 @@ def _prepare_transactions(
 
     start_date = report_date - pd.DateOffset(months=3)
 
-    result = dataframe[
+    result: pd.DataFrame = dataframe.loc[
         (dataframe["date"] >= start_date)
         & (dataframe["date"] <= report_date)
         & (dataframe["amount"] < 0)
-    ].copy()
+    ]
 
     return result
 
@@ -64,12 +63,18 @@ def spending_by_category(
     """Формирует отчёт о тратах по категории."""
     dataframe = _prepare_transactions(transactions, date)
 
-    if "Категория" in dataframe.columns:
-        result = dataframe[dataframe["Категория"] == category]
-    else:
-        result = dataframe[dataframe["description"] == category]
+    result: pd.DataFrame
 
-    return pd.DataFrame(result)
+    if "Категория" in dataframe.columns:
+        result = dataframe.loc[
+            dataframe["Категория"] == category
+            ]
+    else:
+        result = dataframe.loc[
+            dataframe["description"] == category
+            ]
+
+    return result
 
 
 @report("report_weekday.txt")
@@ -82,14 +87,14 @@ def spending_by_weekday(
 
     dataframe["weekday"] = dataframe["date"].dt.day_name()
 
-    result = (
+    result: pd.DataFrame = (
         dataframe.groupby("weekday", as_index=False)
         .agg(amount=("amount", "sum"))
     )
 
     result["amount"] = result["amount"].abs().round(2)
 
-    return pd.DataFrame(result)
+    return result
 
 
 @report("report_weekend.txt")
@@ -108,11 +113,11 @@ def spending_by_workday(
         )
     )
 
-    result = (
+    result: pd.DataFrame = (
         dataframe.groupby("day_type", as_index=False)
         .agg(amount=("amount", "sum"))
     )
 
     result["amount"] = result["amount"].abs().round(2)
 
-    return pd.DataFrame(result)
+    return result
