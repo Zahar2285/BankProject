@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TypedDict
 
 import pandas as pd
+import requests
 
 from src.processing import filter_by_state, sort_by_date
 from src.readers import read_csv, read_excel
@@ -122,6 +123,29 @@ class CardInfo(TypedDict):
     cashback: float
 
 
+def get_currency_rates() -> list[dict[str, float | str]]:
+    """Возвращает курсы валют."""
+    currencies = ["USD", "EUR", "GBP"]
+    result = []
+
+    for currency in currencies:
+        response = requests.get(
+            "https://api.exchangerate-api.com/v4/latest/RUB",
+            timeout=10,
+        )
+        data = response.json()
+        rate = data["rates"][currency]
+
+        result.append(
+            {
+                "currency": currency,
+                "rate": round(1 / rate, 2),
+            }
+        )
+
+    return result
+
+
 def show_main_page(data: list[dict]) -> dict:
     """Формирует данные для главной страницы."""
     current_datetime = datetime.now()
@@ -200,7 +224,7 @@ def show_main_page(data: list[dict]) -> dict:
         "greeting": greeting,
         "cards": list(cards.values()),
         "top_transactions": transactions,
-        "currency_rates": [],
+        "currency_rates": get_currency_rates(),
         "stock_prices": [],
     }
 
