@@ -192,11 +192,35 @@ def get_currency_rates() -> list[dict[str, float | str]]:
     return result
 
 
-def show_main_page(data: list[dict]) -> dict:
+def show_main_page(data: list[dict], date_time: str) -> dict:
     """Формирует данные для главной страницы."""
-    current_datetime = datetime.now()
+    current_datetime = datetime.strptime(
+        date_time,
+        "%Y-%m-%d %H:%M:%S",
+    )
     current_hour = current_datetime.hour
+    start_of_month = current_datetime.replace(
+        day=1,
+        hour=0,
+        minute=0,
+        second=0,
+    )
 
+    period_data: list[dict] = []
+
+    for transaction in data:
+        transaction_date = transaction.get("Дата операции")
+
+        if not transaction_date:
+            continue
+
+        transaction_datetime = datetime.strptime(
+            str(transaction_date),
+            "%d.%m.%Y %H:%M:%S",
+        )
+
+        if start_of_month <= transaction_datetime <= current_datetime:
+            period_data.append(transaction)
     if 6 <= current_hour < 12:
         greeting = "Доброе утро"
     elif 12 <= current_hour < 18:
@@ -235,7 +259,7 @@ def show_main_page(data: list[dict]) -> dict:
         card["cashback"] = round(float(card["total_spent"]) / 100, 2)
 
     top_transactions = sorted(
-        data,
+        period_data,
         key=lambda transaction: abs(
             transaction.get("Сумма операции", 0)
         ),
@@ -278,7 +302,7 @@ def show_main_page(data: list[dict]) -> dict:
 def run_main_page() -> None:
     """Запускает главную страницу проекта."""
     data = load_operations("data/operations.xlsx")
-    show_main_page(data)
+    show_main_page(data, "2018-04-07 23:59:59")
 
 
 def main() -> None:
