@@ -5,6 +5,7 @@ from src.readers import read_csv, read_excel
 from src.search import process_bank_search
 from src.utils import load_transactions
 from src.widget import get_date, mask_account_card
+from src.utils import load_operations
 
 DATA_PATHS = {
     "1": "data/operations.json",
@@ -159,6 +160,11 @@ def show_main_page(data: list[dict]) -> None:
             transaction.get("Сумма операции"),
         )
 
+def run_main_page() -> None:
+    """Запускает главную страницу проекта."""
+    data = load_operations("data/operations.xlsx")
+    show_main_page(data)
+    
 
 def main() -> None:
 
