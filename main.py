@@ -160,11 +160,12 @@ def show_main_page(data: list[dict]) -> None:
             transaction.get("Сумма операции"),
         )
 
+
 def run_main_page() -> None:
     """Запускает главную страницу проекта."""
     data = load_operations("data/operations.xlsx")
     show_main_page(data)
-    
+
 
 def main() -> None:
 
