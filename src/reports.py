@@ -2,9 +2,11 @@ from datetime import datetime
 from functools import wraps
 from typing import Any, Callable
 
+import pandas as pd
+
 
 def report(filename: str = "report.txt") -> Callable:
-    """Декоратор сохраняет результат отчёта в файл."""
+    """Сохраняет результат отчёта в файл."""
 
     def decorator(func: Callable) -> Callable:
         @wraps(func)
@@ -21,75 +23,96 @@ def report(filename: str = "report.txt") -> Callable:
     return decorator
 
 
+def _prepare_transactions(
+    transactions: pd.DataFrame,
+    date: str | None,
+) -> pd.DataFrame:
+    """Подготавливает расходы за последние три месяца."""
+    if date is None:
+        report_date = pd.Timestamp.now(tz="UTC")
+    else:
+        report_date = pd.Timestamp(date, tz="UTC")
+
+    dataframe = transactions.copy()
+
+    dataframe["date"] = pd.to_datetime(
+        dataframe["date"],
+        utc=True,
+    )
+    dataframe["amount"] = pd.to_numeric(
+        dataframe["amount"],
+        errors="coerce",
+    )
+
+    start_date = report_date - pd.DateOffset(months=3)
+
+    result = dataframe[
+        (dataframe["date"] >= start_date)
+        & (dataframe["date"] <= report_date)
+        & (dataframe["amount"] < 0)
+    ].copy()
+
+    return result
+
+
 @report()
-def spending_by_category(data: list[dict], category: str) -> str:
-    """Формирует отчёт о тратах по указанной категории."""
-    total = 0.0
+def spending_by_category(
+    transactions: pd.DataFrame,
+    category: str,
+    date: str | None = None,
+) -> pd.DataFrame:
+    """Формирует отчёт о тратах по категории."""
+    dataframe = _prepare_transactions(transactions, date)
 
-    for transaction in data:
-        if transaction.get("Категория") == category:
-            amount = transaction.get("Сумма операции", 0)
+    if "Категория" in dataframe.columns:
+        result = dataframe[dataframe["Категория"] == category]
+    else:
+        result = dataframe[dataframe["description"] == category]
 
-            if amount < 0:
-                total += abs(amount)
-
-    return f"Категория: {category}\nСумма трат: {round(total, 2)} руб."
+    return pd.DataFrame(result)
 
 
 @report("report_weekday.txt")
-def spending_by_weekday(data: list[dict]) -> dict[str, float]:
-    """Считает сумму трат по дням недели."""
-    result: dict[str, float] = {}
+def spending_by_weekday(
+    transactions: pd.DataFrame,
+    date: str | None = None,
+) -> pd.DataFrame:
+    """Формирует отчёт о тратах по дням недели."""
+    dataframe = _prepare_transactions(transactions, date)
 
-    for transaction in data:
-        amount = transaction.get("Сумма операции", 0)
+    dataframe["weekday"] = dataframe["date"].dt.day_name()
 
-        if amount >= 0:
-            continue
+    result = (
+        dataframe.groupby("weekday", as_index=False)
+        .agg(amount=("amount", "sum"))
+    )
 
-        date = transaction.get("Дата операции")
+    result["amount"] = result["amount"].abs().round(2)
 
-        if not date:
-            continue
-
-        date = datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
-        weekday = date.strftime("%A")
-
-        result[weekday] = result.get(weekday, 0) + abs(amount)
-
-    return {
-        day: round(total, 2)
-        for day, total in result.items()
-    }
+    return pd.DataFrame(result)
 
 
 @report("report_weekend.txt")
-def spending_by_workday(data: list[dict]) -> dict[str, float]:
-    """Считает траты отдельно в рабочие и выходные дни."""
-    result = {
-        "Рабочий день": 0.0,
-        "Выходной день": 0.0,
-    }
+def spending_by_workday(
+    transactions: pd.DataFrame,
+    date: str | None = None,
+) -> pd.DataFrame:
+    """Формирует отчёт о тратах в рабочие и выходные дни."""
+    dataframe = _prepare_transactions(transactions, date)
 
-    for transaction in data:
-        amount = transaction.get("Сумма операции", 0)
+    dataframe["day_type"] = dataframe["date"].dt.weekday.map(
+        lambda day: (
+            "Рабочий день"
+            if day < 5
+            else "Выходной день"
+        )
+    )
 
-        if amount >= 0:
-            continue
+    result = (
+        dataframe.groupby("day_type", as_index=False)
+        .agg(amount=("amount", "sum"))
+    )
 
-        date = transaction.get("Дата операции")
+    result["amount"] = result["amount"].abs().round(2)
 
-        if not date:
-            continue
-
-        date = datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
-
-        if date.weekday() < 5:
-            result["Рабочий день"] += abs(amount)
-        else:
-            result["Выходной день"] += abs(amount)
-
-    return {
-        day: round(total, 2)
-        for day, total in result.items()
-    }
+    return pd.DataFrame(result)
