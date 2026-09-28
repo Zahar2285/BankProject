@@ -219,3 +219,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+report.txt
+report_weekday.txt
+report_weekend.txt
