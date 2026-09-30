@@ -172,3 +172,87 @@ def test_get_events_period_all():
 
     assert start_date == datetime.min
     assert end_date == current_datetime
+
+from src.views import show_events_page, show_main_page
+
+
+def test_show_main_page(monkeypatch):
+    monkeypatch.setattr(
+        "src.views.get_currency_rates",
+        lambda: [{"currency": "USD", "rate": 80.0}],
+    )
+    monkeypatch.setattr(
+        "src.views.get_stock_prices",
+        lambda: [{"stock": "AAPL", "price": 200.0}],
+    )
+
+    data = [
+        {
+            "Дата операции": "15.12.2021 10:00:00",
+            "Номер карты": "*1234",
+            "Сумма операции": -1000,
+            "Категория": "Продукты",
+            "Описание": "Магазин",
+        },
+        {
+            "Дата операции": "14.12.2021 10:00:00",
+            "Номер карты": "*1234",
+            "Сумма операции": -500,
+            "Категория": "Одежда",
+            "Описание": "Магазин одежды",
+        },
+    ]
+
+    result = show_main_page(data, "2021-12-15 12:00:00")
+
+    assert result["greeting"] == "Добрый день"
+    assert len(result["cards"]) == 1
+    assert result["cards"][0]["last_digits"] == "1234"
+    assert result["cards"][0]["total_spent"] == 1500
+    assert result["currency_rates"] == [
+        {"currency": "USD", "rate": 80.0}
+    ]
+    assert result["stock_prices"] == [
+        {"stock": "AAPL", "price": 200.0}
+    ]
+
+
+def test_show_events_page(monkeypatch):
+    monkeypatch.setattr(
+        "src.views.get_currency_rates",
+        lambda: [{"currency": "USD", "rate": 80.0}],
+    )
+    monkeypatch.setattr(
+        "src.views.get_stock_prices",
+        lambda: [{"stock": "AAPL", "price": 200.0}],
+    )
+
+    data = [
+        {
+            "Дата операции": "15.12.2021 10:00:00",
+            "Сумма операции": -1000,
+            "Категория": "Продукты",
+            "Описание": "Магазин",
+        },
+        {
+            "Дата операции": "14.12.2021 10:00:00",
+            "Сумма операции": 5000,
+            "Категория": "Зарплата",
+            "Описание": "Зарплата",
+        },
+    ]
+
+    result = show_events_page(
+        data,
+        "2021-12-15 12:00:00",
+        "M",
+    )
+
+    assert result["expenses"]["total_amount"] == 1000
+    assert result["income"]["total_amount"] == 5000
+    assert result["currency_rates"] == [
+        {"currency": "USD", "rate": 80.0}
+    ]
+    assert result["stock_prices"] == [
+        {"stock": "AAPL", "price": 200.0}
+    ]
