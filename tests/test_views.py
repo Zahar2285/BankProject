@@ -163,3 +163,12 @@ def test_get_events_period_year():
 
     assert start_date == datetime(2021, 1, 1, 0, 0, 0)
     assert end_date == current_datetime
+
+
+def test_get_events_period_all():
+    current_datetime = datetime(2021, 12, 15, 12, 30, 0)
+
+    start_date, end_date = _get_events_period(current_datetime, "ALL")
+
+    assert start_date == datetime.min
+    assert end_date == current_datetime
