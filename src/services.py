@@ -1,5 +1,9 @@
 import re
 
+from collections import defaultdict
+from math import ceil
+from typing import Any
+
 
 def simple_search(data: list[dict], search: str) -> list[dict]:
     """Ищет операции по категории или описанию."""
@@ -57,10 +61,6 @@ def search_person_transfers(data: list[dict]) -> list[dict]:
             data,
         )
     )
-
-from collections import defaultdict
-from math import ceil
-from typing import Any
 
 
 def cashback_categories(
