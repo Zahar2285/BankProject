@@ -7,6 +7,7 @@ from src.views import (
 from src.views import _build_expenses, _build_income
 from datetime import datetime
 from src.views import _get_events_period
+from src.views import show_events_page, show_main_page
 
 
 def test_get_greeting():
@@ -73,6 +74,7 @@ def test_build_top_transactions():
 
 
 def test_build_expenses():
+
         data = [
             {
                 "Сумма операции": -1000,
@@ -108,6 +110,7 @@ def test_build_expenses():
             {"category": "Наличные", "amount": 100},
         ]
 
+
 def test_build_income():
         data = [
             {
@@ -135,7 +138,7 @@ def test_build_income():
             {"category": "Зарплата", "amount": 7000},
             {"category": "Кешбэк", "amount": 500},
         ]
-from src.views import _get_events_period
+
 
 
 def test_get_events_period_week():
@@ -172,8 +175,6 @@ def test_get_events_period_all():
 
     assert start_date == datetime.min
     assert end_date == current_datetime
-
-from src.views import show_events_page, show_main_page
 
 
 def test_show_main_page(monkeypatch):
