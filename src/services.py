@@ -19,9 +19,13 @@ def simple_search(data: list[dict], search: str) -> list[dict]:
 def search_phone_numbers(data: list[dict]) -> list[dict]:
     """Ищет операции, в описании которых есть номер телефона."""
     pattern = re.compile(
-        r"(?:\+7|8)"
-        r"\s*(?:\(\d{3}\)|\d{3})"
-        r"(?:[\s-]*\d{2}){3}"
+        r"(?:"
+        r"\+7\s*\(\d{3}\)\s*\d{3}[-\s]\d{2}[-\s]\d{2}"
+        r"|"
+        r"\+7\s*\d{3}\s+\d{2}[-\s]\d{2}[-\s]\d{2}"
+        r"|"
+        r"8\d{10}"
+        r")"
     )
 
     return list(
