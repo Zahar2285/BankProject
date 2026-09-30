@@ -5,46 +5,51 @@ def simple_search(data: list[dict], search: str) -> list[dict]:
     """Ищет операции по категории или описанию."""
     search = search.lower()
 
-    result = []
-
-    for transaction in data:
-        category = str(transaction.get("Категория", "")).lower()
-        description = str(transaction.get("Описание", "")).lower()
-
-        if search in category or search in description:
-            result.append(transaction)
-
-    return result
+    return list(
+        filter(
+            lambda transaction: (
+                search in str(transaction.get("Категория", "")).lower()
+                or search in str(transaction.get("Описание", "")).lower()
+            ),
+            data,
+        )
+    )
 
 
 def search_phone_numbers(data: list[dict]) -> list[dict]:
-
     """Ищет операции, в описании которых есть номер телефона."""
-    pattern = re.compile(r"\+7\s?\d{3}\s?\d{2}[-\s]?\d{2}[-\s]?\d{2}")
+    pattern = re.compile(
+        r"(?:\+7|8)"
+        r"\s*(?:\(\d{3}\)|\d{3})"
+        r"(?:[\s-]*\d{2}){3}"
+    )
 
-    result = []
-
-    for transaction in data:
-        description = str(transaction.get("Описание", ""))
-
-        if pattern.search(description):
-            result.append(transaction)
-
-    return result
+    return list(
+        filter(
+            lambda transaction: pattern.search(
+                str(transaction.get("Описание", ""))
+            )
+            is not None,
+            data,
+        )
+    )
 
 
 def search_person_transfers(data: list[dict]) -> list[dict]:
-
     """Ищет переводы физическим лицам."""
-    pattern = re.compile(r"[А-ЯЁ][а-яё]+\s+[А-ЯЁ]\.")
+    pattern = re.compile(
+        r"[А-ЯЁ][а-яё]+\s+[А-ЯЁ]\."
+    )
 
-    result = []
-
-    for transaction in data:
-        category = str(transaction.get("Категория", ""))
-        description = str(transaction.get("Описание", ""))
-
-        if category == "Переводы" and pattern.search(description):
-            result.append(transaction)
-
-    return result
+    return list(
+        filter(
+            lambda transaction: (
+                str(transaction.get("Категория", "")) == "Переводы"
+                and pattern.search(
+                    str(transaction.get("Описание", ""))
+                )
+                is not None
+            ),
+            data,
+        )
+    )
