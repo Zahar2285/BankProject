@@ -1,4 +1,6 @@
 from src.services import (
+    cashback_categories,
+    investment_bank,
     search_person_transfers,
     search_phone_numbers,
     simple_search,
@@ -37,3 +39,60 @@ def test_search_person_transfers() -> None:
     assert search_person_transfers(data) == [
         {"Категория": "Переводы", "Описание": "Переводы - Константин Л."}
     ]
+
+
+def test_cashback_categories() -> None:
+    data = [
+        {
+            "Дата операции": "2021-12-10",
+            "Категория": "Супермаркеты",
+            "Кэшбэк": 10,
+        },
+        {
+            "Дата операции": "2021-12-15",
+            "Категория": "Рестораны",
+            "Кэшбэк": 5,
+        },
+        {
+            "Дата операции": "2021-12-20",
+            "Категория": "Супермаркеты",
+            "Кэшбэк": 15,
+        },
+        {
+            "Дата операции": "2021-11-20",
+            "Категория": "Супермаркеты",
+            "Кэшбэк": 100,
+        },
+    ]
+
+    result = cashback_categories(data, 2021, 12)
+
+    assert result == {
+        "Супермаркеты": 25.0,
+        "Рестораны": 5.0,
+    }
+
+
+def test_investment_bank() -> None:
+    transactions = [
+        {
+            "Дата операции": "2021-12-10",
+            "Сумма операции": -1712,
+        },
+        {
+            "Дата операции": "2021-12-15",
+            "Сумма операции": -100,
+        },
+        {
+            "Дата операции": "2021-11-20",
+            "Сумма операции": -999,
+        },
+    ]
+
+    result = investment_bank(
+        "2021-12",
+        transactions,
+        50,
+    )
+
+    assert result == 38.0

@@ -1,13 +1,16 @@
+from datetime import datetime
+
 from src.views import (
     _build_cards,
+    _build_expenses,
+    _build_income,
     _build_top_transactions,
+    _get_events_period,
     _get_greeting,
     _parse_date,
+    show_events_page,
+    show_main_page,
 )
-from src.views import _build_expenses, _build_income
-from datetime import datetime
-from src.views import _get_events_period
-from src.views import show_events_page, show_main_page
 
 
 def test_get_greeting():
@@ -74,71 +77,69 @@ def test_build_top_transactions():
 
 
 def test_build_expenses():
+    data = [
+        {
+            "Сумма операции": -1000,
+            "Категория": "Продукты",
+        },
+        {
+            "Сумма операции": -500,
+            "Категория": "Продукты",
+        },
+        {
+            "Сумма операции": -300,
+            "Категория": "Одежда",
+        },
+        {
+            "Сумма операции": -200,
+            "Категория": "Переводы",
+        },
+        {
+            "Сумма операции": -100,
+            "Категория": "Снятие наличных",
+        },
+    ]
 
-        data = [
-            {
-                "Сумма операции": -1000,
-                "Категория": "Продукты",
-            },
-            {
-                "Сумма операции": -500,
-                "Категория": "Продукты",
-            },
-            {
-                "Сумма операции": -300,
-                "Категория": "Одежда",
-            },
-            {
-                "Сумма операции": -200,
-                "Категория": "Переводы",
-            },
-            {
-                "Сумма операции": -100,
-                "Категория": "Снятие наличных",
-            },
-        ]
+    result = _build_expenses(data)
 
-        result = _build_expenses(data)
-
-        assert result["total_amount"] == 2100
-        assert result["main"][0] == {
-            "category": "Продукты",
-            "amount": 1500,
-        }
-        assert result["transfers_and_cash"] == [
-            {"category": "Переводы", "amount": 200},
-            {"category": "Наличные", "amount": 100},
-        ]
+    assert result["total_amount"] == 2100
+    assert result["main"][0] == {
+        "category": "Продукты",
+        "amount": 1500,
+    }
+    assert result["transfers_and_cash"] == [
+        {"category": "Переводы", "amount": 200},
+        {"category": "Наличные", "amount": 100},
+    ]
 
 
 def test_build_income():
-        data = [
-            {
-                "Сумма операции": 5000,
-                "Категория": "Зарплата",
-            },
-            {
-                "Сумма операции": 2000,
-                "Категория": "Зарплата",
-            },
-            {
-                "Сумма операции": 500,
-                "Категория": "Кешбэк",
-            },
-            {
-                "Сумма операции": -1000,
-                "Категория": "Продукты",
-            },
-        ]
+    data = [
+        {
+            "Сумма операции": 5000,
+            "Категория": "Зарплата",
+        },
+        {
+            "Сумма операции": 2000,
+            "Категория": "Зарплата",
+        },
+        {
+            "Сумма операции": 500,
+            "Категория": "Кешбэк",
+        },
+        {
+            "Сумма операции": -1000,
+            "Категория": "Продукты",
+        },
+    ]
 
-        result = _build_income(data)
+    result = _build_income(data)
 
-        assert result["total_amount"] == 7500
-        assert result["main"] == [
-            {"category": "Зарплата", "amount": 7000},
-            {"category": "Кешбэк", "amount": 500},
-        ]
-
+    assert result["total_amount"] == 7500
+    assert result["main"] == [
+        {"category": "Зарплата", "amount": 7000},
+        {"category": "Кешбэк", "amount": 500},
+    ]
 
 
 def test_get_events_period_week():
