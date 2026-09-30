@@ -34,7 +34,6 @@ def _prepare_transactions(
     else:
         report_date = pd.Timestamp(date, tz="UTC")
 
-        # Если передана только дата, учитываем весь этот день.
         if report_date.hour == 0 and report_date.minute == 0:
             end_date = report_date + pd.Timedelta(days=1) - pd.Timedelta(
                 nanoseconds=1
@@ -44,23 +43,32 @@ def _prepare_transactions(
 
     dataframe = transactions.copy()
 
-    dataframe["Дата операции"] = pd.to_datetime(
-        dataframe["Дата операции"],
-        dayfirst=True,
-        utc=True,
-    )
-
-    dataframe["Сумма операции"] = pd.to_numeric(
-        dataframe["Сумма операции"],
-        errors="coerce",
-    )
+    if "Дата операции" in dataframe.columns:
+        dataframe["date"] = pd.to_datetime(
+            dataframe["Дата операции"],
+            dayfirst=True,
+            utc=True,
+        )
+        dataframe["amount"] = pd.to_numeric(
+            dataframe["Сумма операции"],
+            errors="coerce",
+        )
+    else:
+        dataframe["date"] = pd.to_datetime(
+            dataframe["date"],
+            utc=True,
+        )
+        dataframe["amount"] = pd.to_numeric(
+            dataframe["amount"],
+            errors="coerce",
+        )
 
     start_date = report_date - pd.DateOffset(months=3)
 
     result: pd.DataFrame = dataframe.loc[
-        (dataframe["Дата операции"] >= start_date)
-        & (dataframe["Дата операции"] <= end_date)
-        & (dataframe["Сумма операции"] < 0)
+        (dataframe["date"] >= start_date)
+        & (dataframe["date"] <= end_date)
+        & (dataframe["amount"] < 0)
     ].copy()
 
     return result
@@ -76,12 +84,18 @@ def spending_by_category(
 
     dataframe = _prepare_transactions(transactions, date)
 
-    result = dataframe.loc[
-        dataframe["Категория"].astype(str).str.lower()
-        == category.lower()
-    ].copy()
-
-    result["Сумма операции"] = result["Сумма операции"].abs()
+    if "Категория" in dataframe.columns:
+        result: pd.DataFrame = dataframe.loc[
+            dataframe["Категория"].astype(str).str.lower()
+            == category.lower()
+        ].copy()
+    elif "description" in dataframe.columns:
+        result = dataframe.loc[
+            dataframe["description"].astype(str).str.lower()
+            == category.lower()
+        ].copy()
+    else:
+        result = pd.DataFrame()
 
     return result
 
@@ -95,14 +109,12 @@ def spending_by_weekday(
 
     dataframe = _prepare_transactions(transactions, date)
 
-    dataframe["weekday"] = dataframe["Дата операции"].dt.day_name()
+    dataframe["weekday"] = dataframe["date"].dt.day_name()
+    dataframe["amount"] = dataframe["amount"].abs()
 
-    dataframe["Сумма операции"] = dataframe["Сумма операции"].abs()
-
-    result: pd.DataFrame = (
-        dataframe.groupby("weekday", as_index=False)
-        .agg(amount=("Сумма операции", "mean"))
-    )
+    result: pd.DataFrame = pd.DataFrame(
+        dataframe.groupby("weekday")["amount"].sum()
+    ).reset_index()
 
     result["amount"] = result["amount"].round(2)
 
@@ -118,7 +130,7 @@ def spending_by_workday(
 
     dataframe = _prepare_transactions(transactions, date)
 
-    dataframe["day_type"] = dataframe["Дата операции"].dt.weekday.map(
+    dataframe["day_type"] = dataframe["date"].dt.weekday.map(
         lambda day: (
             "Рабочий день"
             if day < 5
@@ -126,12 +138,11 @@ def spending_by_workday(
         )
     )
 
-    dataframe["Сумма операции"] = dataframe["Сумма операции"].abs()
+    dataframe["amount"] = dataframe["amount"].abs()
 
-    result: pd.DataFrame = (
-        dataframe.groupby("day_type", as_index=False)
-        .agg(amount=("Сумма операции", "mean"))
-    )
+    result: pd.DataFrame = pd.DataFrame(
+        dataframe.groupby("day_type")["amount"].mean()
+    ).reset_index()
 
     result["amount"] = result["amount"].round(2)
 
