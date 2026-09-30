@@ -57,3 +57,67 @@ def search_person_transfers(data: list[dict]) -> list[dict]:
             data,
         )
     )
+
+from collections import defaultdict
+from math import ceil
+from typing import Any
+
+
+def cashback_categories(
+    data: list[dict],
+    year: int,
+    month: int,
+) -> dict[str, float]:
+    """Возвращает сумму кешбэка по категориям за указанный месяц."""
+    filtered_data = filter(
+        lambda transaction: (
+            transaction.get("Дата операции", "").startswith(
+                f"{year:04d}-{month:02d}"
+            )
+            and transaction.get("Кэшбэк", 0) > 0
+        ),
+        data,
+    )
+
+    cashback_by_category: dict[str, float] = defaultdict(float)
+
+    for transaction in filtered_data:
+        category = str(transaction.get("Категория", "Без категории"))
+        cashback = float(transaction.get("Кэшбэк", 0))
+        cashback_by_category[category] += cashback
+
+    return dict(
+        sorted(
+            cashback_by_category.items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+    )
+
+
+def investment_bank(
+    month: str,
+    transactions: list[dict[str, Any]],
+    limit: int,
+) -> float:
+    """Рассчитывает сумму, которую можно отложить в Инвесткопилку."""
+    if limit <= 0:
+        raise ValueError("Лимит должен быть больше нуля")
+
+    month_transactions = filter(
+        lambda transaction: (
+            str(transaction.get("Дата операции", "")).startswith(month)
+            and float(transaction.get("Сумма операции", 0)) < 0
+        ),
+        transactions,
+    )
+
+    savings = map(
+        lambda transaction: (
+            ceil(abs(float(transaction["Сумма операции"])) / limit) * limit
+            - abs(float(transaction["Сумма операции"]))
+        ),
+        month_transactions,
+    )
+
+    return round(sum(savings), 2)
