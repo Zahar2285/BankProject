@@ -308,7 +308,7 @@ def get_currency_rates() -> list[dict[str, Any]]:
     settings = load_user_settings()
     currencies = settings["user_currencies"]
 
-    result = []
+    result: list[dict[str, Any]] = []
 
     try:
         response = requests.get(
