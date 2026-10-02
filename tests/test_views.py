@@ -21,6 +21,7 @@ def test_get_greeting():
     assert _get_greeting(22) == "Добрый вечер"
     assert _get_greeting(23) == "Доброй ночи"
 
+
 def test_parse_date():
     assert _parse_date("31.12.2021 15:30:00") is not None
     assert _parse_date("2021-12-31 15:30:00") is not None
