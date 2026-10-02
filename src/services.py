@@ -67,8 +67,9 @@ def cashback_categories(
     data: list[dict],
     year: int,
     month: int,
+    limit: int = 3,
 ) -> dict[str, float]:
-    """Возвращает сумму кешбэка по категориям за указанный месяц."""
+    """Возвращает категории с максимальным кешбэком за указанный месяц."""
     filtered_data = filter(
         lambda transaction: (
             transaction.get("Дата операции", "").startswith(
@@ -91,7 +92,7 @@ def cashback_categories(
             cashback_by_category.items(),
             key=lambda item: item[1],
             reverse=True,
-        )
+        )[:limit]
     )
 
 

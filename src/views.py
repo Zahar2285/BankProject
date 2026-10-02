@@ -105,16 +105,12 @@ def _get_period_data(
 
 
 def _get_greeting(hour: int) -> str:
-    """Возвращает приветствие в зависимости от времени."""
-    if 6 <= hour < 12:
+    if 5 <= hour < 12:
         return "Доброе утро"
-
     if 12 <= hour < 18:
         return "Добрый день"
-
-    if 18 <= hour < 24:
+    if 18 <= hour < 23:
         return "Добрый вечер"
-
     return "Доброй ночи"
 
 
@@ -348,7 +344,7 @@ def get_stock_prices() -> list[dict[str, Any]]:
     settings = load_user_settings()
     stocks = settings["user_stocks"]
 
-    api_key = os.getenv("STOCK_API_KEY")
+    api_key = os.getenv("API_KEY")
 
     if not api_key:
         return []
